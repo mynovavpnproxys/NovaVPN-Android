@@ -17,6 +17,9 @@ jobs:
           flutter-version: '3.35.7'
           channel: stable
 
+      - name: Create Flutter project
+        run: flutter create --project-name novavpn --org com.novavpn .
+
       - name: Install dependencies
         run: flutter pub get
 
