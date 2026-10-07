@@ -1,0 +1,31 @@
+name: Build NovaVPN
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.35.7'
+          channel: stable
+
+      - name: Generate Android project
+        run: |
+          mkdir -p .flutter_android
+          flutter create --project-name novavpn --org com .flutter_android
+            sed -i '/dependencies {/a    implementation("com.github.singbox-android:libbox:1.14.1")' .flutter_android/android/app/build.gradle.kts
+          cp -Rn .flutter_android/android/. android/
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build APK
+        run: flutter build apk --release
