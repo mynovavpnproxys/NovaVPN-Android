@@ -20,8 +20,6 @@ jobs:
       - name: Create Flutter project
         run: flutter create --project-name novavpn --org com.novavpn .
 
-        - name: Generate Android project
-          run: flutter create --project-name novavpn --org com.novavpn --platforms android .
       - name: Install dependencies
         run: flutter pub get
 
