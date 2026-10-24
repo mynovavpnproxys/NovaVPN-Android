@@ -3,25 +3,51 @@ name: Build NovaVPN
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.7'
+          flutter-version: '3.47.5'
           channel: stable
+          cache: true
 
-      - name: Create Flutter project
-        run: flutter create --project-name novavpn --org com.novavpn .
+      - name: Generate Android platform project
+        run: flutter create --platforms=android --project-name novavpn --org com.novavpn .
+
+      # flutter create regenerates its sample widget test, which targets MyApp.
+      # Remove that template test; project-specific unit tests are kept and run below.
+      - name: Remove generated sample widget test
+        run: rm -f test/widget_test.dart
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
+      - name: Analyze Dart code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build release APK
         run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: NovaVPN-APK
+          path: build/app/outputs/flutter-apk/app-release.apk
+          if-no-files-found: error
+          retention-days: 14
