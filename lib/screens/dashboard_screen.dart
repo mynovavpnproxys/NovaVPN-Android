@@ -1,3 +1,4 @@
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import '../models/nova_server.dart';
 import '../services/nova_vpn_engine.dart';
@@ -62,6 +63,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
   @override Widget build(BuildContext context) {
     final server = _selectedServer;
     return SafeArea(child: ListView(padding: const EdgeInsets.fromLTRB(20, 24, 20, 20), children: [
+      Center(child: SvgPicture.asset('assets/nova_logo.svg', width: 148, height: 148, semanticsLabel: 'NOVA VPN logo')),
+      const SizedBox(height: 10),
       const Text('NOVA VPN', textAlign: TextAlign.center, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, letterSpacing: 1.5)),
       const SizedBox(height: 6),
       Text(_busy ? 'در حال انجام عملیات...' : (_connected ? 'اتصال امن برقرار است' : 'اینترنت آزاد و امن'), textAlign: TextAlign.center, style: const TextStyle(color: Colors.white60, fontSize: 14)),
