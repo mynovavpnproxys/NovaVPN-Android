@@ -27,6 +27,11 @@ jobs:
       - name: Generate Android platform project
         run: flutter create --platforms=android --project-name novavpn --org com.novavpn .
 
+      # flutter create regenerates its sample widget test, which targets MyApp.
+      # Remove that template test; project-specific unit tests are kept and run below.
+      - name: Remove generated sample widget test
+        run: rm -f test/widget_test.dart
+
       - name: Install dependencies
         run: flutter pub get
 
