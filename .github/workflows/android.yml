@@ -3,11 +3,17 @@ name: Build NovaVPN
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 30
 
     steps:
       - uses: actions/checkout@v4
@@ -16,14 +22,18 @@ jobs:
         with:
           flutter-version: '3.35.7'
           channel: stable
-
-      - name: Create Flutter project
-        run: flutter create --project-name novavpn --org com.novavpn .
+          cache: true
 
       - name: Install dependencies
         run: flutter pub get
 
-      - name: Build APK
+      - name: Analyze Dart code
+        run: flutter analyze
+
+      - name: Run tests
+        run: flutter test
+
+      - name: Build release APK
         run: flutter build apk --release
 
       - name: Upload APK
