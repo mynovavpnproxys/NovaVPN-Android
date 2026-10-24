@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<defs>
+ <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B34BFF"/><stop offset="0.55" stop-color="#785BFF"/><stop offset="1" stop-color="#24D5FF"/></linearGradient>
+ <linearGradient id="letter" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B84CFF"/><stop offset="0.5" stop-color="#865BFF"/><stop offset="1" stop-color="#1DCFFF"/></linearGradient>
+ <filter id="glow"><feGaussianBlur stdDeviation="8" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+</defs>
+<rect width="512" height="512" rx="100" fill="#11152F"/>
+<circle cx="256" cy="262" r="180" fill="none" stroke="url(#edge)" stroke-width="3" opacity=".35"/>
+<path d="M256 76 L392 134 Q395 137 395 145 L388 260 Q378 350 256 435 Q134 350 124 260 L117 145 Q117 137 120 134 Z" fill="#0E1537" stroke="url(#edge)" stroke-width="5" stroke-linejoin="round" filter="url(#glow)"/>
+<path d="M256 55 L267 85 L298 96 L267 107 L256 139 L245 107 L214 96 L245 85 Z" fill="#27CFFF" filter="url(#glow)"/>
+<path d="M177 170 H215 L296 273 V170 H334 V324 H296 L215 221 V324 H177 Z" fill="url(#letter)" stroke="#E7E9FF" stroke-width="2.2" stroke-linejoin="round" filter="url(#glow)"/>
+<text x="256" y="367" font-family="Arial, Helvetica, sans-serif" font-size="25" font-weight="700" letter-spacing="9" text-anchor="middle" fill="#EAFBFF">VPN</text>
+</svg>
