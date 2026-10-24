@@ -1,3 +1,4 @@
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/material.dart';
 import '../widgets/subscription_card.dart';
 
@@ -76,6 +77,22 @@ class SettingsScreen extends StatelessWidget {
             color: const Color(0xFF111522),
             child: Column(
               children: [
+                ListTile(
+                  leading: const Icon(Icons.volunteer_activism_outlined, color: Color(0xFF00D9FF)),
+                  title: const Text('حمایت از NovaVPN (تبلیغ اختیاری)'),
+                  subtitle: const Text('با انتخاب شما، صفحه پیشنهادهای تبلیغاتی باز می‌شود'),
+                  trailing: const Icon(Icons.open_in_new),
+                  onTap: () async {
+                    final uri = Uri.parse('https://asiafilm.org/4/0a72bc9d378be74f04a1ec6cc70cc6e7');
+                    final opened = await launchUrl(uri, mode: LaunchMode.externalApplication);
+                    if (!opened && context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('باز کردن صفحه تبلیغ ممکن نشد.')),
+                      );
+                    }
+                  },
+                ),
+                const Divider(height: 1),
                 ListTile(
                   leading: const Icon(Icons.info_outline),
                   title: const Text('درباره NovaVPN'),
