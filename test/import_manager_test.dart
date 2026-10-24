@@ -56,4 +56,41 @@ void main() {
     expect(parser.parse('trojan://secret@example.com:70000'), isNull);
     expect(parser.parse('trojan://secret@example.com:0'), isNull);
   });
+
+  test('rejects VLESS Reality links without a public key', () {
+    const link =
+        'vless://123e4567-e89b-12d3-a456-426614174000@edge.example.com:443?security=reality&sid=abcd#Reality';
+    final server = parser.parse(link);
+    expect(server, isNotNull);
+    expect(parser.toSingBoxConfig(server!), isNull);
+  });
+
+  test('rejects malformed VLESS and VMess UUIDs', () {
+    const vless = 'vless://not-a-uuid@edge.example.com:443?security=tls';
+    final vmessPayload = base64Url.encode(utf8.encode(jsonEncode({
+      'v': '2', 'ps': 'Bad VMess', 'add': 'vmess.example.com',
+      'port': '443', 'id': 'not-a-uuid', 'net': 'tcp',
+    })));
+    final vlessServer = parser.parse(vless);
+    final vmessServer = parser.parse('vmess://$vmessPayload');
+    expect(vlessServer, isNotNull);
+    expect(parser.toSingBoxConfig(vlessServer!), isNull);
+    expect(vmessServer, isNotNull);
+    expect(parser.toSingBoxConfig(vmessServer!), isNull);
+  });
+
+  test('accepts VLESS Reality when its public key is present', () {
+    const link =
+        'vless://123e4567-e89b-12d3-a456-426614174000@edge.example.com:443?security=reality&pbk=publicKeyValue&sid=abcd&sni=edge.example.com&type=tcp#Reality';
+    final server = parser.parse(link);
+    expect(server, isNotNull);
+    final config = parser.toSingBoxConfig(server!);
+    expect(config, isNotNull);
+    final outbound = (config!['outbounds'] as List).first as Map;
+    final tls = outbound['tls'] as Map;
+    final reality = tls['reality'] as Map;
+    expect(reality['public_key'], 'publicKeyValue');
+    expect(reality['short_id'], 'abcd');
+  });
+
 }
