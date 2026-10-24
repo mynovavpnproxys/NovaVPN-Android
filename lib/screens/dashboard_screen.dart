@@ -38,8 +38,39 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
   }
 
+  Future<bool> _confirmVpnDisclosure() async {
+    final accepted = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('اجازه و شفاف‌سازی اتصال VPN'),
+        content: const Text(
+          'با اتصال، ترافیک شبکهٔ دستگاه از سرور انتخاب‌شده عبور می‌کند. '
+          'اپراتور آن سرور ممکن است فراداده‌های اتصال را پردازش کند. '
+          'فقط از کانفیگ و سروری استفاده کنید که به آن اعتماد دارید. '
+          'برای شروع تونل VPN، اندروید نیز اجازهٔ جداگانه درخواست می‌کند.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('انصراف'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('می‌پذیرم و ادامه می‌دهم'),
+          ),
+        ],
+      ),
+    );
+    return accepted == true;
+  }
+
   Future<void> _toggleConnection() async {
     if (_busy) return;
+    if (!_connected) {
+      final consent = await _confirmVpnDisclosure();
+      if (!consent || !mounted) return;
+    }
     final server = _selectedServer;
     if (!_connected && server == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('ابتدا از بخش سرورها یک کانفیگ معتبر وارد کنید.')));
