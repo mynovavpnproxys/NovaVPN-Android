@@ -13,16 +13,19 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.35.7'
+          flutter-version: '3.41.0'
           channel: stable
           cache: true
+
+      - name: Generate Android platform project
+        run: flutter create --platforms=android --project-name novavpn --org com.novavpn .
 
       - name: Install dependencies
         run: flutter pub get
