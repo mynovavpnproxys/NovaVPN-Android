@@ -13,9 +13,7 @@ class NovaVpnEngine {
   Future<void> initialize() async {
     if (_initialized) return;
     final ready = await _engine.initialize();
-    if (!ready) {
-      throw StateError('موتور VPN راه‌اندازی نشد.');
-    }
+    if (!ready) throw StateError('موتور VPN راه‌اندازی نشد.');
     _initialized = true;
   }
 
@@ -23,9 +21,7 @@ class NovaVpnEngine {
     await initialize();
     final config = _importManager.toSingBoxConfig(server);
     if (config == null) {
-      throw FormatException(
-        'این لینک یا یکی از گزینه‌های آن هنوز قابل پشتیبانی نیست.',
-      );
+      throw FormatException('این لینک یا یکی از گزینه‌های آن هنوز قابل پشتیبانی نیست.');
     }
     return _engine.connect(jsonEncode(config));
   }
@@ -37,13 +33,7 @@ class NovaVpnEngine {
 
   Future<bool> get isConnected async {
     await initialize();
-    return (await _engine.getConnectionStatus()) ==
-        SingBoxConnectionStatus.connected;
+    final status = await _engine.getConnectionStatus();
+    return status.name == 'connected';
   }
-
-  Stream<SingBoxConnectionStatus> get connectionStatus =>
-      _engine.watchSingBoxConnectionStatus();
-
-  Stream<SingBoxConnectionStats> get statistics =>
-      _engine.watchSingBoxConnectionStats();
 }
