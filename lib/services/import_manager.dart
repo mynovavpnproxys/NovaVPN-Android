@@ -97,9 +97,14 @@ class ImportManager {
     switch (server.protocol) {
       case 'VLESS':
         final uuid = uri.userInfo.split(':').first;
-        if (uuid.isEmpty) return null;
+        if (uuid.isEmpty || !_looksLikeUuid(uuid)) return null;
         final query = uri.queryParameters;
         final security = (query['security'] ?? 'none').toLowerCase();
+        // Reality needs a public key; emitting an empty key produces a broken profile.
+        if (security == 'reality' &&
+            (query['pbk'] ?? query['publicKey'] ?? '').trim().isEmpty) {
+          return null;
+        }
         outbound = {
           'type': 'vless',
           'tag': 'proxy',
@@ -129,12 +134,14 @@ class ImportManager {
         final data = jsonDecode(utf8.decode(
           base64Url.decode(base64Url.normalize(encoded)),
         )) as Map<String, dynamic>;
+        final uuid = (data['id'] ?? '').toString().trim();
+        if (!_looksLikeUuid(uuid)) return null;
         outbound = {
           'type': 'vmess',
           'tag': 'proxy',
           'server': server.address,
           'server_port': server.port,
-          'uuid': (data['id'] ?? '').toString(),
+          'uuid': uuid,
           'security': (data['scy'] ?? data['security'] ?? 'auto').toString(),
           'alter_id': int.tryParse((data['aid'] ?? '0').toString()) ?? 0,
         };
@@ -253,6 +260,61 @@ class ImportManager {
       },
     };
   }
+
+  bool _looksLikeUuid(String value) =>
+      RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}    Map<String, dynamic> outbound,
+    String transport,
+    Map<String, dynamic> query,
+  ) {
+    switch (transport.toLowerCase()) {
+      case 'ws':
+        outbound['transport'] = {
+          'type': 'ws',
+          'path': query['path'] ?? '/',
+          if ((query['host'] ?? query['host_header'] ?? '').toString().isNotEmpty)
+            'headers': {
+              'Host': (query['host'] ?? query['host_header']).toString(),
+            },
+        };
+        break;
+      case 'grpc':
+        outbound['transport'] = {
+          'type': 'grpc',
+          'service_name': query['serviceName'] ?? query['service_name'] ?? '',
+        };
+        break;
+      case 'http':
+      case 'h2':
+        outbound['transport'] = {
+          'type': 'http',
+          'path': query['path'] ?? '/',
+          if ((query['host'] ?? '').toString().isNotEmpty)
+            'host': [query['host'].toString()],
+        };
+        break;
+      case 'tcp':
+      case '':
+        break;
+      default:
+        // Unknown transport parameters should not be silently misrepresented.
+        outbound['transport'] = {'type': transport};
+    }
+  }
+
+  String? _decodeShadowsocksAuthority(String authority) {
+    try {
+      final value = authority.contains('@')
+          ? authority.substring(0, authority.lastIndexOf('@'))
+          : authority;
+      if (value.contains(':')) return value;
+      return utf8.decode(base64Url.decode(base64Url.normalize(value)));
+    } catch (_) {
+      return null;
+    }
+  }
+}
+)
+          .hasMatch(value);
 
   void _applyTransport(
     Map<String, dynamic> outbound,
